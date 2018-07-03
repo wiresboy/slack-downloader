@@ -203,8 +203,12 @@ if __name__ == '__main__':
 				file_url = f["url_private_download"]
 				basedir = OUTPUTDIR+'/'+channel
 				local_filename = get_local_filename(basedir, date, filename, user)
-				print "Downloading file '"+str(file_url)+"'"
-				download_file(file_url, local_filename, basedir)
+				if (os.path.isfile(local_filename)):
+					if DEBUG:
+						print("File '"+local_filename+"'already downloaded. Skipping")
+				else:
+					print "Downloading file '"+str(file_url)+"'"
+					download_file(file_url, local_filename, basedir)
 				if ts == None or float(date) > float(ts): ts = date
 			except Exception, e:
 				if DEBUG: print str(e)
