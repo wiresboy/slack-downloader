@@ -195,9 +195,11 @@ if __name__ == '__main__':
 					channel = get_channel_name(f['channels'][0])
 				elif len(f['groups']) > 0:
 					channel = get_group_name(f['groups'][0])
+				elif len(f['ims']) > 0:
+					channel = "IM/"+f['ims'][0]
 				else:
 					print "No channel/group for file", f['id']
-					continue
+					channel = "unknown_channel"
 				file_url = f["url_private_download"]
 				basedir = OUTPUTDIR+'/'+channel
 				local_filename = get_local_filename(basedir, date, filename, user)
