@@ -5,6 +5,9 @@
 # Author: Enrico Cambiaso
 # Email: enrico.cambiaso[at]gmail.com
 # GitHub project URL: https://github.com/auino/slack-downloader
+#
+# Updated by Brandon John
+# https://github.com/wiresboy/slack-downloader
 # 
 
 import requests
@@ -110,29 +113,42 @@ def download_file(url, local_filename, basedir):
 	except: return False
 	return True
 
+users = dict()
+channels = dict()
+groups = dict()
+
 # get channel name from identifier
 def get_channel_name(id):
-	url = API+'/channels.info'
-	data = {'token': TOKEN, 'channel': id }
-	response = requests.post(url, data=data)
-	if DEBUG and EXTREME_DEBUG: pprint(response_to_json(response))
-	return response_to_json(response)['channel']['name']
+        global channels
+        if channels.get(id, None) == None:
+                url = API+'/channels.info'
+                data = {'token': TOKEN, 'channel': id }
+                response = requests.post(url, data=data)
+                if DEBUG and EXTREME_DEBUG: pprint(response_to_json(response))
+                channels[id] = response_to_json(response)['channel']['name']
+        return channels.get(id)
 
 # get group name from identifier
 def get_group_name(id):
-	url = API+'/groups.info'
-	data = {'token': TOKEN, 'channel': id }
-	response = requests.post(url, data=data)
-	if DEBUG and EXTREME_DEBUG: pprint(response_to_json(response))
-	return response_to_json(response)['group']['name']
+        global groups
+        if groups.get(id, None) == None:
+                url = API+'/groups.info'
+                data = {'token': TOKEN, 'channel': id }
+                response = requests.post(url, data=data)
+                if DEBUG and EXTREME_DEBUG: pprint(response_to_json(response))
+                groups[id] = response_to_json(response)['group']['name']
+        return groups.get(id)
 
 # get user name from identifier
 def get_user_name(id):
-	url = API+'/users.info'
-	data = {'token': TOKEN, 'user': id }
-	response = requests.post(url, data=data)
-	if DEBUG and EXTREME_DEBUG: pprint(response_to_json(response))
-	return response_to_json(response)['user']['name']
+        global users
+        if users.get(id, None) == None:
+                url = API+'/users.info'
+                data = {'token': TOKEN, 'user': id }
+                response = requests.post(url, data=data)
+                if DEBUG and EXTREME_DEBUG: pprint(response_to_json(response))
+                users[id] = response_to_json(response)['user']['name']
+        return users.get(id)
 
 # request files
 def make_requester():
@@ -161,7 +177,6 @@ if __name__ == '__main__':
 	except:
 		os.mkdir(OUTPUTDIR)
 	page = 1
-	users = dict()
 	file_requester = make_requester()
 	ts = None
 	while True:
@@ -175,7 +190,7 @@ if __name__ == '__main__':
 				if DEBUG and EXTREME_DEBUG: pprint(f) # extreme debug
 				filename = f['name']
 				date = str(f['timestamp'])
-				user = users.get(f['user'], get_user_name(f['user']))
+				user = get_user_name(f['user'])
 				if len(f['channels']) > 0:
 					channel = get_channel_name(f['channels'][0])
 				elif len(f['groups']) > 0:
